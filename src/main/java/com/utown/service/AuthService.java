@@ -2,6 +2,9 @@ package com.utown.service;
 
 import com.utown.exception.BadRequestException;
 import com.utown.exception.UnauthorizedException;
+import com.utown.model.dto.auth.AuthResponse;
+import com.utown.model.dto.auth.LoginRequest;
+import com.utown.model.dto.auth.RegisterRequest;
 import com.utown.model.entity.RefreshToken;
 import com.utown.model.entity.User;
 import com.utown.model.enums.UserRole;
@@ -129,7 +132,7 @@ public class AuthService {
 
         log.info("Access token refreshed for userId={}", user.getId());
 
-        String newAccessToken = jwtTokenProvider.generateAccessToken(
+        String newAccessToken = jwtTokenProvider.generateToken(
                 user.getId(),
                 user.getRole().name()
         );
