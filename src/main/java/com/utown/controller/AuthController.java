@@ -1,5 +1,9 @@
 package com.utown.controller;
 
+import com.utown.model.dto.auth.AuthResponse;
+import com.utown.model.dto.auth.LoginRequest;
+import com.utown.model.dto.auth.RefreshTokenRequest;
+import com.utown.model.dto.auth.RegisterRequest;
 import com.utown.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
