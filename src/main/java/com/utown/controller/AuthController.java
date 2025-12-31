@@ -60,7 +60,6 @@ public class AuthController {
     public ResponseEntity<Void> logout(Authentication authentication) {
         log.info("POST /api/auth/logout");
 
-        // Получаем userId из токена (principal содержит userId)
         Long userId = (Long) authentication.getPrincipal();
 
         authService.logout(userId);
