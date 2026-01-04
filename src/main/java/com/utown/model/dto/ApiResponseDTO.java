@@ -14,7 +14,7 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ApiResponse<T>{
+public class ApiResponseDTO<T>{
 
     private boolean success;
     private T data;
@@ -24,30 +24,30 @@ public class ApiResponse<T>{
     @Builder.Default
     private LocalDateTime timestamp = LocalDateTime.now();
 
-    public static <T> ApiResponse<T> success(T data) {
-        return ApiResponse.<T>builder()
+    public static <T> ApiResponseDTO<T> success(T data) {
+        return ApiResponseDTO.<T>builder()
                 .success(true)
                 .data(data)
                 .build();
     }
 
-    public static <T> ApiResponse<T> success(T data, String message) {
-        return ApiResponse.<T>builder()
+    public static <T> ApiResponseDTO<T> success(T data, String message) {
+        return ApiResponseDTO.<T>builder()
                 .success(true)
                 .data(data)
                 .message(message)
                 .build();
     }
 
-    public static <T> ApiResponse<T> success(String message) {
-        return ApiResponse.<T>builder()
+    public static <T> ApiResponseDTO<T> success(String message) {
+        return ApiResponseDTO.<T>builder()
                 .success(true)
                 .message(message)
                 .build();
     }
 
-    public static <T> ApiResponse<T> error(String message, String errorCode) {
-        return ApiResponse.<T>builder()
+    public static <T> ApiResponseDTO<T> error(String message, String errorCode) {
+        return ApiResponseDTO.<T>builder()
                 .success(false)
                 .error(ErrorDetails.builder()
                         .code(errorCode)
@@ -56,8 +56,8 @@ public class ApiResponse<T>{
                 .build();
     }
 
-    public static <T> ApiResponse<T> error(String message, String errorCode, Map<String, String> details) {
-        return ApiResponse.<T>builder()
+    public static <T> ApiResponseDTO<T> error(String message, String errorCode, Map<String, String> details) {
+        return ApiResponseDTO.<T>builder()
                 .success(false)
                 .error(ErrorDetails.builder()
                         .code(errorCode)
