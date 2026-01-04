@@ -38,3 +38,6 @@ build/
 ._*
 .Spotlight-V100
 .Trashes
+.PVS-Studio/
+.mvn/
+.gitattributes
