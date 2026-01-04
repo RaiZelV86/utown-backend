@@ -105,4 +105,16 @@ public class GlobalExceptionHandler {
                         "INTERNAL_ERROR"
                 ));
     }
+
+    @ExceptionHandler(ForbiddenException.class)
+    public ResponseEntity<ApiResponse<Void>> handleForbiddenException(
+            ForbiddenException ex
+    ) {
+        log.warn("Forbidden: {}", ex.getMessage());
+
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .body(ApiResponse.error(ex.getMessage(), "FORBIDDEN"));
+    }
+
 }
