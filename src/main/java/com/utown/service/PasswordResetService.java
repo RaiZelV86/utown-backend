@@ -12,9 +12,12 @@ import com.utown.repository.PasswordResetRequestRepository;
 import com.utown.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -47,7 +50,7 @@ public class PasswordResetService {
         LocalDateTime expiresAt = LocalDateTime.now().plusMinutes(CODE_EXPIRATION_MINUTES);
         PasswordResetRequest resetRequest = PasswordResetRequest.builder()
                 .user(user)
-                .code(HARDCODED_CODE)  // В продакшене: generateRandomCode()
+                .code(HARDCODED_CODE)
                 .expiresAt(expiresAt)
                 .attempts(0)
                 .status(ResetPasswordStatus.PENDING)
