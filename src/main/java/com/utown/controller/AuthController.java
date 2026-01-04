@@ -2,9 +2,13 @@ package com.utown.controller;
 
 import com.utown.model.dto.auth.AuthResponse;
 import com.utown.model.dto.auth.LoginRequest;
+import com.utown.model.dto.auth.PasswordResetConfirmDto;
+import com.utown.model.dto.auth.PasswordResetRequestDto;
+import com.utown.model.dto.auth.PasswordResetVerifyDto;
 import com.utown.model.dto.auth.RefreshTokenRequest;
 import com.utown.model.dto.auth.RegisterRequest;
 import com.utown.service.AuthService;
+import com.utown.service.PasswordResetService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +19,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/auth")
@@ -22,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     private final AuthService authService;
+    private final PasswordResetService passwordResetService;
 
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(
@@ -65,6 +72,39 @@ public class AuthController {
         authService.logout(userId);
 
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/password/reset/request")
+    public ResponseEntity<Map<String, Object>> requestPasswordReset(
+            @Valid @RequestBody PasswordResetRequestDto request
+    ) {
+        log.info("POST /api/auth/password/reset/request - username: {}", request.getUsername());
+
+        Map<String, Object> response = passwordResetService.requestPasswordReset(request);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/password/reset/verify")
+    public ResponseEntity<Map<String, Object>> verifyResetCode(
+            @Valid @RequestBody PasswordResetVerifyDto request
+    ) {
+        log.info("POST /api/auth/password/reset/verify - username: {}", request.getUsername());
+
+        Map<String, Object> response = passwordResetService.verifyResetCode(request);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/password/reset/confirm")
+    public ResponseEntity<Map<String, Object>> confirmPasswordReset(
+            @Valid @RequestBody PasswordResetConfirmDto request
+    ) {
+        log.info("POST /api/auth/password/reset/confirm");
+
+        Map<String, Object> response = passwordResetService.confirmPasswordReset(request);
+
+        return ResponseEntity.ok(response);
     }
 
 }
