@@ -1,7 +1,6 @@
 package com.utown.controller;
 
 import com.utown.model.dto.ApiResponseDTO;
-import com.utown.model.dto.ApiResponseDTODTO;
 import com.utown.model.dto.user.ChangePasswordRequest;
 import com.utown.model.dto.user.UpdateUserRequest;
 import com.utown.model.dto.user.UserDTO;
