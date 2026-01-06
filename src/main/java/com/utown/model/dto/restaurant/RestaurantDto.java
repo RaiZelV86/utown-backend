@@ -40,4 +40,5 @@ public class RestaurantDto {
     private Boolean isFeatured;
     private Boolean isActive;
     private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }

@@ -42,4 +42,6 @@ public class UpdateRestaurantRequest {
     private Integer estimatedDeliveryTime;
 
     private String openingHours;
+    private Boolean isOpen;
+    private Boolean isActive;
 }

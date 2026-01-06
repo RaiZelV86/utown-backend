@@ -1,6 +1,5 @@
 package com.utown.model.dto.auth;
 
-import com.utown.model.entity.PasswordResetRequest;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,8 +13,8 @@ public class PasswordResetResponse {
     private String message;
     private Integer expiresInSeconds;
 
-    public static PasswordResetRequest of(String message, Integer expiresInSeconds) {
-        return PasswordResetRequest.builder()
+    public static PasswordResetResponse of(String message, Integer expiresInSeconds) {
+        return PasswordResetResponse.builder()
                 .message(message)
                 .expiresInSeconds(expiresInSeconds)
                 .build();

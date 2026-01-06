@@ -43,7 +43,7 @@ cd utown-backend
 Copy the example environment file:
 
 ```bash
-cp .env.example .env
+cp .env .env
 ```
 
 Edit `.env` and set your actual values:

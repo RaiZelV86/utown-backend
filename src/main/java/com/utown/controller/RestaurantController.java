@@ -5,6 +5,13 @@ import com.utown.model.dto.restaurant.CreateRestaurantRequest;
 import com.utown.model.dto.restaurant.RestaurantDto;
 import com.utown.model.dto.restaurant.UpdateRestaurantRequest;
 import com.utown.service.RestaurantService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,12 +37,37 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/restaurants")
 @RequiredArgsConstructor
 @Slf4j
+@Tag(name = "Restaurants", description = "Restaurant management endpoints")
 public class RestaurantController {
 
     private final RestaurantService restaurantService;
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
+    @SecurityRequirement(name = "bearerAuth")
+    @Operation(
+            summary = "Create restaurant (Admin only)",
+            description = "Create a new restaurant. Requires ADMIN role."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "201",
+                    description = "Restaurant created successfully",
+                    content = @Content(schema = @Schema(implementation = RestaurantDto.class))
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid input data"
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Unauthorized - invalid or missing token"
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Forbidden - requires ADMIN role"
+            )
+    })
     public ResponseEntity<ApiResponseDTO<RestaurantDto>> createRestaurant(
             @Valid @RequestBody CreateRestaurantRequest request,
             Authentication authentication
@@ -51,6 +83,16 @@ public class RestaurantController {
     }
 
     @GetMapping
+    @Operation(
+            summary = "Get all restaurants",
+            description = "Retrieve paginated list of all restaurants (public endpoint)"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Restaurants retrieved successfully"
+            )
+    })
     public ResponseEntity<ApiResponseDTO<Page<RestaurantDto>>> getAllRestaurants(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
@@ -66,6 +108,21 @@ public class RestaurantController {
     }
 
     @GetMapping("/{id}")
+    @Operation(
+            summary = "Get restaurant by ID",
+            description = "Retrieve restaurant details by ID (public endpoint)"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Restaurant retrieved successfully",
+                    content = @Content(schema = @Schema(implementation = RestaurantDto.class))
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Restaurant not found"
+            )
+    })
     public ResponseEntity<ApiResponseDTO<RestaurantDto>> getRestaurantById(
             @PathVariable Long id
     ) {
@@ -78,6 +135,34 @@ public class RestaurantController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or @restaurantSecurity.isOwner(#id, principal)")
+    @SecurityRequirement(name = "bearerAuth")
+    @Operation(
+            summary = "Update restaurant",
+            description = "Update restaurant details. Requires ADMIN role or restaurant owner."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Restaurant updated successfully",
+                    content = @Content(schema = @Schema(implementation = RestaurantDto.class))
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid input data"
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Unauthorized - invalid or missing token"
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Forbidden - not owner or admin"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Restaurant not found"
+            )
+    })
     public ResponseEntity<ApiResponseDTO<RestaurantDto>> updateRestaurant(
             @PathVariable Long id,
             @Valid @RequestBody UpdateRestaurantRequest request
@@ -91,6 +176,29 @@ public class RestaurantController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
+    @SecurityRequirement(name = "bearerAuth")
+    @Operation(
+            summary = "Delete restaurant (Admin only)",
+            description = "Delete restaurant by ID. Requires ADMIN role."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Restaurant deleted successfully"
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Unauthorized - invalid or missing token"
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Forbidden - requires ADMIN role"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Restaurant not found"
+            )
+    })
     public ResponseEntity<ApiResponseDTO<Void>> deleteRestaurant(
             @PathVariable Long id
     ) {

@@ -71,7 +71,7 @@ public class RestaurantService {
     public Page<RestaurantDto> getAllRestaurants(Pageable pageable) {
         log.info("Getting all restaurants, page={}", pageable.getPageNumber());
 
-        Page<Restaurant> restaurants = restaurantRepository.findAll(pageable);
+        Page<Restaurant> restaurants = restaurantRepository.findAllWithCategory(pageable);
 
         return restaurants.map(this::mapToResponse);
     }
@@ -80,7 +80,7 @@ public class RestaurantService {
     public RestaurantDto getRestaurantById(Long id) {
         log.info("Getting restaurant by id={}", id);
 
-        Restaurant restaurant = restaurantRepository.findById(id)
+        Restaurant restaurant = restaurantRepository.findByIdWithCategory(id)
                 .orElseThrow(() -> new NotFoundException("Restaurant not found"));
 
         return mapToResponse(restaurant);
@@ -134,6 +134,9 @@ public class RestaurantService {
         if (request.getBannerImageUrl() != null) {
             restaurant.setBannerImageUrl(request.getBannerImageUrl());
         }
+        if (request.getOpeningHours() != null) {
+            restaurant.setOpeningHours(request.getOpeningHours());
+        }
         if (request.getIsOpen() != null) {
             restaurant.setIsOpen(request.getIsOpen());
         }
@@ -162,8 +165,9 @@ public class RestaurantService {
         log.info("Restaurant deleted successfully: id={}", id);
     }
 
+    @Transactional(readOnly = true)
     public boolean isOwner(Long restaurantId, Long userId) {
-        Restaurant restaurant = restaurantRepository.findById(restaurantId)
+        Restaurant restaurant = restaurantRepository.findByIdWithCategory(restaurantId)
                 .orElseThrow(() -> new NotFoundException("Restaurant not found"));
 
         return restaurant.getOwner().getId().equals(userId);
@@ -188,6 +192,7 @@ public class RestaurantService {
                 .minOrderAmount(restaurant.getMinOrderAmount())
                 .deliveryFee(restaurant.getDeliveryFee())
                 .estimatedDeliveryTime(restaurant.getEstimatedDeliveryTime())
+                .openingHours(restaurant.getOpeningHours())
                 .isOpen(restaurant.getIsOpen())
                 .isFeatured(restaurant.getIsFeatured())
                 .isActive(restaurant.getIsActive())
