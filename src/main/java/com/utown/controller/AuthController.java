@@ -145,6 +145,20 @@ public class AuthController {
     }
 
     @PostMapping("/password/reset/request")
+    @Operation(
+            summary = "Request password reset code",
+            description = "Send a 4-digit code to reset password (hardcoded as 1234 for now)"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Reset code issued"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "User not found"
+            )
+    })
     public ResponseEntity<ApiResponseDTO<Map<String, Object>>> requestPasswordReset(
             @Valid @RequestBody PasswordResetRequestDto request
     ) {
@@ -156,6 +170,20 @@ public class AuthController {
     }
 
     @PostMapping("/password/reset/verify")
+    @Operation(
+            summary = "Verify reset code",
+            description = "Verify the 4-digit code and receive a reset token"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Code verified, reset token issued"
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid code, expired, or too many attempts"
+            )
+    })
     public ResponseEntity<ApiResponseDTO<Map<String, Object>>> verifyResetCode(
             @Valid @RequestBody PasswordResetVerifyDto request
     ) {
@@ -167,6 +195,20 @@ public class AuthController {
     }
 
     @PostMapping("/password/reset/confirm")
+    @Operation(
+            summary = "Confirm password reset",
+            description = "Set new password using reset token"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Password successfully updated"
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid or expired reset token"
+            )
+    })
     public ResponseEntity<ApiResponseDTO<Map<String, Object>>> confirmPasswordReset(
             @Valid @RequestBody PasswordResetConfirmDto request
     ) {

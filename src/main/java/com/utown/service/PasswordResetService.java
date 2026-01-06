@@ -153,9 +153,4 @@ public class PasswordResetService {
 
         return response;
     }
-
-    private String generateRandomCode() {
-        int code = (int) (Math.random() * 10000);
-        return String.format("%04d", code);
-    }
 }
