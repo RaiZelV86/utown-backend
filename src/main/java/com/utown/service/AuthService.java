@@ -42,14 +42,14 @@ public class AuthService {
                 .phoneNumber(request.getPhoneNumber())
                 .passwordHash(passwordEncoder.encode(request.getPassword()))
                 .name(request.getName())
-                .role(UserRole.CLIENT)  // По умолчанию CLIENT
+                .role(UserRole.CLIENT)
                 .isActive(true)
                 .build();
 
         user = userRepository.save(user);
         log.info("User registered successfully: userId={}", user.getId());
 
-        String accessToken = jwtTokenProvider.generateToken(
+        String accessToken = jwtTokenProvider.generateAccessToken(
                 user.getId(),
                 user.getRole().name()
         );
@@ -85,14 +85,14 @@ public class AuthService {
 
         log.info("User logged in successfully: userId={}", user.getId());
 
-        String accessToken = jwtTokenProvider.generateToken(
+        String accessToken = jwtTokenProvider.generateAccessToken(
                 user.getId(),
                 user.getRole().name()
         );
 
-        String refreshToken = jwtTokenProvider.generateRefreshToken(user.getId());
-
         refreshTokenRepository.deleteByUserId(user.getId());
+
+        String refreshToken = jwtTokenProvider.generateRefreshToken(user.getId());
 
         saveRefreshToken(user, refreshToken);
 
@@ -132,7 +132,7 @@ public class AuthService {
 
         log.info("Access token refreshed for userId={}", user.getId());
 
-        String newAccessToken = jwtTokenProvider.generateToken(
+        String newAccessToken = jwtTokenProvider.generateAccessToken(
                 user.getId(),
                 user.getRole().name()
         );
@@ -164,7 +164,9 @@ public class AuthService {
     }
 
     private void saveRefreshToken(User user, String tokenString) {
-        LocalDateTime expiresAt = LocalDateTime.now().plusDays(7);
+        long ttlMillis = jwtTokenProvider.getRefreshTokenExpiration();
+
+        LocalDateTime expiresAt = LocalDateTime.now().plusNanos(ttlMillis * 1_000_000);
 
         RefreshToken refreshToken = RefreshToken.builder()
                 .user(user)
@@ -174,5 +176,7 @@ public class AuthService {
                 .build();
 
         refreshTokenRepository.save(refreshToken);
+
+        log.debug("Refresh token saved: userId={}, expiresAt={}", user.getId(), expiresAt);
     }
 }

@@ -1,6 +1,7 @@
 package com.utown.security.jwt;
 
 import com.utown.config.Jwtproperties;
+import com.utown.model.enums.TokenType;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Component;
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
+import java.util.UUID;
 
 @Component
 @Slf4j
@@ -28,13 +30,14 @@ public class JwtTokenProvider {
         this.refreshTokenExpiration = jwtproperties.getRefreshTokenExpiration();
     }
 
-    public String generateToken(Long userId, String role) {
+    public String generateAccessToken(Long userId, String role) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + accessTokenExpiration);
 
         return Jwts.builder()
                 .setSubject(String.valueOf(userId))
                 .claim("role", role)
+                .claim("tokenType", TokenType.ACCESS.toString())
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
                 .signWith(secretKey)
@@ -47,30 +50,36 @@ public class JwtTokenProvider {
 
         return Jwts.builder()
                 .setSubject(String.valueOf(userId))
+                .claim("tokenType", TokenType.REFRESH.name())
+                .setId(UUID.randomUUID().toString())
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
                 .signWith(secretKey)
                 .compact();
     }
 
-    public Long getUserIdFromToken(String token) {
-        Claims claims = Jwts.parser()
-                .verifyWith(secretKey)
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
+    public TokenType getTokenType(String token) {
+        Claims claims = getClaims(token);
+        String type = claims.get("tokenType", String.class);
+        return type != null ? TokenType.valueOf(type) : null;
+    }
 
+    public Long getUserIdFromToken(String token) {
+        Claims claims = getClaims(token);
         return Long.parseLong(claims.getSubject());
     }
 
     public String getRoleFromToken(String token) {
-        Claims claims = Jwts.parser()
+        Claims claims = getClaims(token);
+        return claims.get("role", String.class);
+    }
+
+    private Claims getClaims(String token) {
+        return Jwts.parser()
                 .verifyWith(secretKey)
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
-
-        return claims.get("role", String.class);
     }
 
     public boolean validateToken(String token) {
@@ -92,5 +101,9 @@ public class JwtTokenProvider {
         }
 
         return false;
+    }
+
+    public long getRefreshTokenExpiration() {
+        return refreshTokenExpiration;
     }
 }

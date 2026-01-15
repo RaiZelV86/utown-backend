@@ -26,7 +26,7 @@ class JwtTokenProviderTest {
         Long userId = 1L;
         String role = "admin";
 
-        String token = jwtTokenProvider.generateToken(userId,role);
+        String token = jwtTokenProvider.generateAccessToken(userId,role);
 
         assertNotNull(token);
         assertTrue(jwtTokenProvider.validateToken(token));

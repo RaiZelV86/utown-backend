@@ -1,6 +1,5 @@
 package com.utown.security;
 
-import com.utown.repository.RestaurantRepository;
 import com.utown.service.RestaurantService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

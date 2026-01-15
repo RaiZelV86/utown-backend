@@ -23,7 +23,7 @@ import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity
+@EnableMethodSecurity(prePostEnabled = true)
 @RequiredArgsConstructor
 public class SecurityConfig {
 
@@ -46,16 +46,23 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/api/auth/**",
+                                "/api/public/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
                                 "/v3/api-docs/**",
                                 "/swagger-resources/**",
-                                "/webjars/**"
+                                "/webjars/**",
+                                "/actuator/health"
                         ).permitAll()
 
                         .requestMatchers(HttpMethod.GET, "/api/restaurants", "/api/restaurants/**")
                         .permitAll()
-
+                        .requestMatchers("/api/user/**")
+                        .hasRole("CLIENT")
+                        .requestMatchers("/api/restaurant-owner/**")
+                        .hasAnyRole("RESTAURANT_OWNER", "ADMIN")
+                        .requestMatchers("/api/admin/**", "/api/users/**")
+                        .hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
 

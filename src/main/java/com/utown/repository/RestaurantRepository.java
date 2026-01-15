@@ -36,4 +36,10 @@ public interface RestaurantRepository extends JpaRepository<Restaurant, Long> {
 
     @Query("SELECT r FROM Restaurant r WHERE r.isActive = true AND r.rating >= :minRating ORDER BY r.rating DESC")
     List<Restaurant> findTopRatedRestaurants(@Param("minRating") BigDecimal minRating, Pageable pageable);
+
+    @Query("SELECT r FROM Restaurant r JOIN FETCH r.category WHERE r.owner.id = :ownerId")
+    Page<Restaurant> findByOwnerId(@Param("ownerId") Long ownerId, Pageable pageable);
+
+    @Query("SELECT r FROM Restaurant r JOIN FETCH r.category WHERE r.owner.id = :ownerId")
+    List<Restaurant> findByOwnerId(@Param("ownerId") Long ownerId);
 }

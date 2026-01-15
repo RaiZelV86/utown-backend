@@ -1,5 +1,6 @@
 package com.utown.security.jwt;
 
+import com.utown.model.enums.TokenType;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -35,6 +36,20 @@ public class JwtAuthenticationFilter  extends OncePerRequestFilter {
             String jwt = getJwtFromRequest(request);
 
             if (StringUtils.hasText(jwt) && jwtTokenProvider.validateToken(jwt)) {
+
+                TokenType tokenType = jwtTokenProvider.getTokenType(jwt);
+
+                if (tokenType == TokenType.REFRESH) {
+                    log.warn("Attempt to use REFRESH token for API access. Token: {}",
+                            jwt.substring(0, Math.min(jwt.length(), 20)) + "...");
+
+                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                    response.setContentType("application/json");
+                    response.getWriter().write(
+                            "{\"error\": \"Refresh token cannot be used for API access\"}"
+                    );
+                    return; // ← Прерываем выполнение фильтра
+                }
 
                 Long userId = jwtTokenProvider.getUserIdFromToken(jwt);
                 String role = jwtTokenProvider.getRoleFromToken(jwt);
