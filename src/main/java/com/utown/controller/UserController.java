@@ -31,16 +31,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/users")
 @RequiredArgsConstructor
 @Slf4j
-@Tag(name = "Users", description = "User management endpoints")
 @SecurityRequirement(name = "bearerAuth")
 public class UserController {
 
     private final UserService userService;
 
-    @GetMapping("/me")
+    @GetMapping("/api/user/me")
+    @PreAuthorize("hasRole('CLIENT')")
+    @Tag(name = "User (Client)", description = "Endpoints for clients")
     @Operation(
             summary = "Get current user profile",
             description = "Get authenticated user's profile information"
@@ -54,6 +54,10 @@ public class UserController {
             @ApiResponse(
                     responseCode = "401",
                     description = "Unauthorized - invalid or missing token"
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Forbidden - requires CLIENT role"
             )
     })
     public ResponseEntity<ApiResponseDTO<UserDTO>> getCurrentUser(Authentication authentication) {
@@ -63,7 +67,9 @@ public class UserController {
         return ResponseEntity.ok(ApiResponseDTO.success(user));
     }
 
-    @PutMapping("/me")
+    @PutMapping("/api/user/me")
+    @PreAuthorize("hasRole('CLIENT')")
+    @Tag(name = "User (Client)", description = "Endpoints for clients")
     @Operation(
             summary = "Update current user profile",
             description = "Update authenticated user's profile information"
@@ -93,7 +99,9 @@ public class UserController {
         return ResponseEntity.ok(ApiResponseDTO.success(user, "Profile updated successfully"));
     }
 
-    @PutMapping("/me/password")
+    @PutMapping("/api/user/me/password")
+    @PreAuthorize("hasRole('CLIENT')")
+    @Tag(name = "User (Client)", description = "Endpoints for clients")
     @Operation(
             summary = "Change user password",
             description = "Change authenticated user's password"
@@ -122,8 +130,9 @@ public class UserController {
         return ResponseEntity.ok(ApiResponseDTO.success("Password changed successfully"));
     }
 
-    @GetMapping
+    @GetMapping("/api/users")
     @PreAuthorize("hasRole('ADMIN')")
+    @Tag(name = "Users (Admin)", description = "Admin endpoints for user management")
     @Operation(
             summary = "Get all users (Admin only)",
             description = "Retrieve paginated list of all users. Requires ADMIN role."
@@ -151,8 +160,9 @@ public class UserController {
         return ResponseEntity.ok(ApiResponseDTO.success(users));
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/api/users/{id}")
     @PreAuthorize("hasRole('ADMIN')")
+    @Tag(name = "Users (Admin)", description = "Admin endpoints for user management")
     @Operation(
             summary = "Get user by ID (Admin only)",
             description = "Retrieve user details by ID. Requires ADMIN role."
@@ -182,8 +192,9 @@ public class UserController {
         return ResponseEntity.ok(ApiResponseDTO.success(user));
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/api/users/{id}")
     @PreAuthorize("hasRole('ADMIN')")
+    @Tag(name = "Users (Admin)", description = "Admin endpoints for user management")
     @Operation(
             summary = "Delete user (Admin only)",
             description = "Delete user by ID. Requires ADMIN role."

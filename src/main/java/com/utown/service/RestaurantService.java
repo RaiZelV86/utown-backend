@@ -87,7 +87,7 @@ public class RestaurantService {
     }
 
     @Transactional
-    public RestaurantDto updateRestaurant(Long id, UpdateRestaurantRequest request) {
+        public RestaurantDto updateRestaurant(Long id, UpdateRestaurantRequest request) {
         log.info("Updating restaurant: id={}", id);
 
         Restaurant restaurant = restaurantRepository.findById(id)
@@ -173,6 +173,53 @@ public class RestaurantService {
         return restaurant.getOwner().getId().equals(userId);
     }
 
+    @Transactional
+    public void updateRestaurantStatus(Long restaurantId, Long currentUserId, Boolean isOpen) {
+        log.info("Updating restaurant status: restaurantId={}, userId={}, isOpen={}",
+                restaurantId, currentUserId, isOpen);
+
+        Restaurant restaurant = restaurantRepository.findById(restaurantId)
+                .orElseThrow(() -> new NotFoundException("Restaurant not found"));
+
+        User currentUser = userRepository.findById(currentUserId)
+                .orElseThrow(() -> new NotFoundException("User not found"));
+
+        boolean isOwner = restaurant.getOwner().getId().equals(currentUserId);
+        boolean isAdmin = currentUser.getRole().name().equals("ADMIN");
+
+        if (!isOwner && !isAdmin) {
+            log.warn("User {} is not owner or admin of restaurant {}", currentUserId, restaurantId);
+            throw new com.utown.exception.ForbiddenException(
+                    "You don't have permission to change this restaurant's status"
+            );
+        }
+
+        restaurant.setIsOpen(isOpen);
+        restaurantRepository.save(restaurant);
+
+        log.info("Restaurant status updated successfully: id={}, isOpen={}", restaurantId, isOpen);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<RestaurantDto> getRestaurantsByOwnerId(Long ownerId, Pageable pageable) {
+        log.info("Getting restaurants by ownerId={}", ownerId);
+
+        Page<Restaurant> restaurants = restaurantRepository.findByOwnerId(ownerId, pageable);
+
+        return restaurants.map(this::mapToResponse);
+    }
+
+    @Transactional(readOnly = true)
+    public java.util.List<RestaurantDto> getRestaurantsByOwnerId(Long ownerId) {
+        log.info("Getting all restaurants by ownerId={}", ownerId);
+
+        java.util.List<Restaurant> restaurants = restaurantRepository.findByOwnerId(ownerId);
+
+        return restaurants.stream()
+                .map(this::mapToResponse)
+                .collect(java.util.stream.Collectors.toList());
+    }
+    
     private RestaurantDto mapToResponse(Restaurant restaurant) {
         return RestaurantDto.builder()
                 .id(restaurant.getId())
