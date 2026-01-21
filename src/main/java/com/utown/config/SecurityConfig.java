@@ -55,7 +55,12 @@ public class SecurityConfig {
                                 "/actuator/health"
                         ).permitAll()
 
-                        .requestMatchers(HttpMethod.GET, "/api/restaurants", "/api/restaurants/**")
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/restaurants",
+                                "/api/restaurants/**",
+                                "/api/menu-items/**",
+                                "/api/categories/**",
+                                "/api/restaurants/{id}/menu-items/**")
                         .permitAll()
                         .requestMatchers("/api/user/**")
                         .hasRole("CLIENT")

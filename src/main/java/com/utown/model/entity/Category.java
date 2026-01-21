@@ -31,9 +31,6 @@ public class Category {
     @Column(unique = true, nullable = false, length = 100)
     private String name;
 
-    @Column(name = "name_kr", length = 100)
-    private String nameKr;
-
     @Column(name = "icon_url", length = 500)
     private String iconUrl;
 

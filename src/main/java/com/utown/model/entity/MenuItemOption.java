@@ -46,7 +46,7 @@ public class MenuItemOption {
     private BigDecimal price;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
+    @Column(nullable = false, length = 50)
     private OptionType type;
 
     @Column(name = "option_group", length = 50)
