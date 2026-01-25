@@ -91,7 +91,7 @@ public class Restaurant {
     private String openingHours;
 
     @Column(name = "is_open")
-    private Boolean isOpen = false;
+    private Boolean isOpen = true;
 
     @Column(name = "is_featured")
     private Boolean isFeatured = false;

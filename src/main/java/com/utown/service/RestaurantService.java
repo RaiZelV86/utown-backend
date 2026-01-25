@@ -55,7 +55,7 @@ public class RestaurantService {
                 .minOrderAmount(request.getMinOrderAmount() != null ? request.getMinOrderAmount() : BigDecimal.ZERO)
                 .deliveryFee(request.getDeliveryFee() != null ? request.getDeliveryFee() : BigDecimal.ZERO)
                 .estimatedDeliveryTime(request.getEstimatedDeliveryTime())
-                .isOpen(false)  // По умолчанию закрыт
+                .isOpen(false)
                 .isFeatured(false)
                 .isActive(true)
                 .build();

@@ -27,7 +27,7 @@ public class OrderItem {
     private MenuItem menuItem;
 
     @Column(name = "menu_item_name", nullable = false, length = 200)
-    private String menuItemName; // Snapshot of name at order time
+    private String menuItemName;
 
     @Column(nullable = false)
     private Integer quantity = 1;
@@ -36,7 +36,7 @@ public class OrderItem {
     private BigDecimal unitPrice;
 
     @Column(name = "selected_options", columnDefinition = "JSON")
-    private String selectedOptions; // Snapshot of selected options
+    private String selectedOptions;
 
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal subtotal;

@@ -45,4 +45,28 @@ public class CartDTO {
         private Integer itemCount;
         private Boolean meetsMinimum;
     }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class CartItemDTO {
+        private Long id;
+        private MenuItemSummaryDTO menuItem;
+        private Integer quantity;
+        private String selectedOptions;
+        private BigDecimal subtotal;
+
+        @Data
+        @Builder
+        @NoArgsConstructor
+        @AllArgsConstructor
+        public static class MenuItemSummaryDTO {
+            private Long id;
+            private String name;
+            private BigDecimal price;
+            private String imageUrl;
+            private Boolean isAvailable;
+        }
+    }
 }

@@ -83,7 +83,7 @@ public class MenuItemController {
     }
 
     @PostMapping("/menu-items")
-    @PreAuthorize("hasAnyRole('RESTAURANT_OWNER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @SecurityRequirement(name = "bearerAuth")
     @Operation(
             summary = "Create menu item",

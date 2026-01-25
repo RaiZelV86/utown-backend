@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 public class AddressDTO {
 
     private Long id;
+    private Long userId;
     private String address;
     private String detailAddress;
     private String city;
