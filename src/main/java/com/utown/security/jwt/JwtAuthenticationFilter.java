@@ -48,7 +48,7 @@ public class JwtAuthenticationFilter  extends OncePerRequestFilter {
                     response.getWriter().write(
                             "{\"error\": \"Refresh token cannot be used for API access\"}"
                     );
-                    return; // ← Прерываем выполнение фильтра
+                    return;
                 }
 
                 Long userId = jwtTokenProvider.getUserIdFromToken(jwt);

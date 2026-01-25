@@ -70,7 +70,6 @@ public class MenuItemService {
     public List<MenuItemDTO> getRestaurantMenuItems(Long restaurantId) {
         log.debug("Getting all menu items for restaurant: {}", restaurantId);
 
-        // Проверяем существование ресторана
         if (!restaurantRepository.existsById(restaurantId)) {
             throw new NotFoundException("Restaurant not found with id: " + restaurantId);
         }
