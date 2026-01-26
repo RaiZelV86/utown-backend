@@ -4,6 +4,7 @@ import com.utown.model.dto.ApiResponseDTO;
 import com.utown.model.dto.restaurant.CreateRestaurantRequest;
 import com.utown.model.dto.restaurant.RestaurantDto;
 import com.utown.model.dto.restaurant.UpdateRestaurantRequest;
+import com.utown.model.dto.restaurant.UpdateRestaurantStatusRequest;
 import com.utown.service.RestaurantService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -25,6 +26,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -172,6 +174,45 @@ public class RestaurantController {
         RestaurantDto response = restaurantService.updateRestaurant(id, request);
 
         return ResponseEntity.ok(ApiResponseDTO.success(response, "Restaurant updated successfully"));
+    }
+
+    @PatchMapping("/{id}/status")
+    @PreAuthorize("hasRole('ADMIN') or @restaurantSecurity.isOwner(#id, principal)")
+    @SecurityRequirement(name = "bearerAuth")
+    @Operation(
+            summary = "Update restaurant status (open/close)",
+            description = "Update restaurant open/close status. Only restaurant owner or ADMIN can perform this action."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Restaurant status updated successfully"
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Unauthorized - invalid or missing token"
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Forbidden - not owner or admin"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Restaurant not found"
+            )
+    })
+    public ResponseEntity<ApiResponseDTO<Void>> updateRestaurantStatus(
+            @PathVariable Long id,
+            @Valid @RequestBody UpdateRestaurantStatusRequest request,
+            Authentication authentication) {
+
+        Long userId = (Long) authentication.getPrincipal();
+        log.info("PATCH /api/restaurants/{}/status - Updating restaurant status to: {} by user: {}",
+                id, request.getIsOpen(), userId);
+
+        restaurantService.updateRestaurantStatus(id, userId, request.getIsOpen());
+
+        return ResponseEntity.ok(ApiResponseDTO.success(null, "Restaurant status updated successfully"));
     }
 
     @DeleteMapping("/{id}")
