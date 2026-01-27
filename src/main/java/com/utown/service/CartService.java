@@ -76,8 +76,9 @@ public class CartService {
             }
         }
 
-        CartItem existingItem = cartItemRepository
-                .findByCartIdAndMenuItemId(cart.getId(), menuItem.getId())
+        CartItem existingItem = cart.getItems().stream()
+                .filter(item -> item.getMenuItem().getId().equals(menuItem.getId()))
+                .findFirst()
                 .orElse(null);
 
         if (existingItem != null) {
@@ -85,14 +86,13 @@ public class CartService {
             cartItemRepository.save(existingItem);
         } else {
             CartItem newItem = CartItem.builder()
-                    .cart(cart)
                     .menuItem(menuItem)
                     .quantity(request.getQuantity())
                     .selectedOptions(request.getSelectedOptions())
                     .build();
             cart.addItem(newItem);
-            cartItemRepository.save(newItem);
         }
+            cartRepository.save(cart);
 
         log.info("Added item {} to cart for user {}", menuItem.getId(), userId);
 
@@ -115,6 +115,9 @@ public class CartService {
         cartItem.setQuantity(request.getQuantity());
         cartItemRepository.save(cartItem);
 
+        Cart cart = cartItem.getCart();
+        cartRepository.save(cart);
+
         log.info("Updated cart item {} quantity to {} for user {}", cartItemId, request.getQuantity(), userId);
 
         return mapToDTO(cartItem.getCart());
@@ -131,7 +134,7 @@ public class CartService {
 
         Cart cart = cartItem.getCart();
         cart.removeItem(cartItem);
-        cartItemRepository.delete(cartItem);
+        cartRepository.save(cart);
 
         if (cart.getItems().isEmpty()) {
             cartRepository.delete(cart);

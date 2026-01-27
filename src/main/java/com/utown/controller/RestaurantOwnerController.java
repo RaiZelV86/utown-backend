@@ -59,8 +59,8 @@ public class RestaurantOwnerController {
     public ResponseEntity<Map<String, Object>> getMyRestaurants(Authentication authentication) {
         Long currentUserId = (Long) authentication.getPrincipal();
 
-        var restaurants = restaurantService.getRestaurantById(currentUserId);
-
+        var restaurants = restaurantService.getRestaurantsByOwnerId(currentUserId);
+        
         return ResponseEntity.ok(Map.of(
                 "success", true,
                 "data", restaurants
