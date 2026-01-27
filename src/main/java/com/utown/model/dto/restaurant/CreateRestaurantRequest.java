@@ -53,4 +53,6 @@ public class CreateRestaurantRequest {
     private Integer estimatedDeliveryTime;
 
     private String openingHours;
+
+    private Long ownerId;
 }

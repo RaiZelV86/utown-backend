@@ -37,8 +37,8 @@ public class MenuItemService {
     private final UserRepository userRepository;
 
     @Transactional
-    public RestaurantMenuDTO getRestaurantMenu(Long restaurantId, String categoryName, boolean isAvailable) {
-        log.debug("Getting restaurant menu: {}, category: {}, aviable: {} ",
+    public RestaurantMenuDTO getRestaurantMenu(Long restaurantId, String categoryName, Boolean isAvailable) {
+        log.debug("Getting restaurant menu: {}, category: {}, available: {} ",
                 restaurantId, categoryName, isAvailable);
 
         Restaurant restaurant = restaurantRepository.findById(restaurantId)
