@@ -45,6 +45,7 @@ public class OrderService {
     private final AddressRepository addressRepository;
     private final UserRepository userRepository;
     private final RestaurantRepository restaurantRepository;
+    private final NotificationService notificationService;
 
     @Transactional
     public OrderDTO createOrder(Long userId, CreateOrderRequest request) {
@@ -127,6 +128,7 @@ public class OrderService {
 
         log.info("Order {} created for user {}", orderNumber, userId);
 
+        notificationService.sendOrderCreatedNotification(order);
 
         return mapToDTO(order);
     }
@@ -209,6 +211,7 @@ public class OrderService {
         log.info("Order {} status updated from {} to {} by user {}",
                 order.getOrderNumber(), oldStatus, request.getStatus(), currentUserId);
 
+        notificationService.sendOrderStatusChangedNotification(order, oldStatus);
 
         return mapToDTO(order);
     }
@@ -233,6 +236,8 @@ public class OrderService {
 
         log.info("Order {} cancelled by user {}. Reason: {}",
                 order.getOrderNumber(), currentUserId, request.getReason());
+
+        notificationService.sendOrderStatusChangedNotification(order, OrderStatus.PENDING);
 
         return mapToDTO(order);
     }
