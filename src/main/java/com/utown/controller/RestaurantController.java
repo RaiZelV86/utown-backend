@@ -78,7 +78,7 @@ public class RestaurantController {
 
         Long currentUserId = (Long) authentication.getPrincipal();
         Long ownerId = request.getOwnerId() != null ? request.getOwnerId() : currentUserId;
-        RestaurantDto response = restaurantService.createRestaurant(request, ownerId, currentUserId);
+        RestaurantDto response = restaurantService.createRestaurant(request, ownerId);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)

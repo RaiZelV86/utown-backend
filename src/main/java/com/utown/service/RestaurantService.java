@@ -29,16 +29,8 @@ public class RestaurantService {
     private final UserRepository userRepository;
 
     @Transactional
-    public RestaurantDto createRestaurant(CreateRestaurantRequest request, Long ownerId, Long currentUserId) {
-        log.info("Creating restaurant: name={}, ownerId={}, currentUserId={}", request.getName(), ownerId, currentUserId);
-
-        if (!ownerId.equals(currentUserId)) {
-            User currentUser = userRepository.findById(currentUserId)
-                    .orElseThrow(() -> new NotFoundException("Current user not found"));
-            if (!currentUser.getRole().name().equals("ADMIN")) {
-                throw new com.utown.exception.ForbiddenException("Only ADMIN can create restaurant for another owner");
-            }
-        }
+    public RestaurantDto createRestaurant(CreateRestaurantRequest request, Long ownerId) {
+        log.info("Creating restaurant: name={}, ownerId={}", request.getName(), ownerId);
 
         Category category = categoryRepository.findById(request.getCategoryId())
                 .orElseThrow(() -> new NotFoundException("Category not found"));

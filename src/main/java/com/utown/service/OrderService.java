@@ -229,6 +229,7 @@ public class OrderService {
             throw new BadRequestException("Only pending orders can be cancelled by customer");
         }
 
+        OrderStatus previousStatus = order.getStatus();
         order.setStatus(OrderStatus.CANCELLED);
         order.setCancellationReason(request.getReason());
 
@@ -237,7 +238,7 @@ public class OrderService {
         log.info("Order {} cancelled by user {}. Reason: {}",
                 order.getOrderNumber(), currentUserId, request.getReason());
 
-        notificationService.sendOrderStatusChangedNotification(order, OrderStatus.PENDING);
+        notificationService.sendOrderStatusChangedNotification(order, previousStatus);
 
         return mapToDTO(order);
     }
