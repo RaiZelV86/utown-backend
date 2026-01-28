@@ -47,12 +47,17 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/api/auth/**",
                                 "/api/public/**",
+                                "/api/test/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
                                 "/v3/api-docs/**",
                                 "/swagger-resources/**",
                                 "/webjars/**",
-                                "/actuator/health"
+                                "/actuator/health",
+                                "/ws/**",
+                                "/*.html",
+                                "/*.js",
+                                "/*.css"
                         ).permitAll()
 
                         .requestMatchers(HttpMethod.GET,
