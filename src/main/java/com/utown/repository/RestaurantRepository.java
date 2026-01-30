@@ -42,4 +42,7 @@ public interface RestaurantRepository extends JpaRepository<Restaurant, Long> {
 
     @Query("SELECT r FROM Restaurant r JOIN FETCH r.category WHERE r.owner.id = :ownerId")
     List<Restaurant> findByOwnerId(@Param("ownerId") Long ownerId);
+
+    boolean existsByIdAndOwnerId(Long restaurantId, Long ownerId);
+
 }
