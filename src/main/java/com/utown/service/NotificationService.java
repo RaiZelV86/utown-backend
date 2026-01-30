@@ -1,5 +1,6 @@
 package com.utown.service;
 
+import com.utown.constant.NotificationTopics;
 import com.utown.model.dto.notification.NotificationDTO;
 import com.utown.model.dto.notification.OrderNotificationData;
 import com.utown.model.entity.Order;
@@ -31,7 +32,8 @@ public class NotificationService {
                 .restaurantId(order.getRestaurant().getId())
                 .build();
 
-        NotificationDTO notification = NotificationDTO.builder()
+        // Уведомление для ресторана (все сотрудники получат через топик)
+        NotificationDTO restaurantNotification = NotificationDTO.builder()
                 .type(NotificationType.ORDER_CREATED)
                 .title("New Order Received")
                 .message(String.format("New order #%s has been placed", order.getOrderNumber()))
@@ -39,8 +41,13 @@ public class NotificationService {
                 .timestamp(LocalDateTime.now())
                 .build();
 
-        sendToUser(order.getRestaurant().getOwner().getId(), notification);
+        // Отправка в топик ресторана (для всех сотрудников)
+        sendToRestaurantTopic(order.getRestaurant().getId(), restaurantNotification);
 
+        // Отправка в топик конкретного заказа (для клиента и ресторана)
+        sendToOrderTopic(order.getId(), restaurantNotification);
+
+        // Персональное уведомление клиенту
         sendToUser(order.getUser().getId(), NotificationDTO.builder()
                 .type(NotificationType.ORDER_CREATED)
                 .title("Order Placed Successfully")
@@ -76,18 +83,43 @@ public class NotificationService {
                 .timestamp(LocalDateTime.now())
                 .build();
 
+        // Отправка в топик ресторана (для всех сотрудников)
+        sendToRestaurantTopic(order.getRestaurant().getId(), notification);
+
+        // Отправка в топик конкретного заказа (для клиента и ресторана)
+        sendToOrderTopic(order.getId(), notification);
+
+        // Персональное уведомление клиенту
         sendToUser(order.getUser().getId(), notification);
 
-        sendToUser(order.getRestaurant().getOwner().getId(), notification);
-
         log.info("Order status changed notifications sent successfully");
+    }
+
+    public void sendToRestaurantTopic(Long restaurantId, NotificationDTO notification) {
+        try {
+            String destination = NotificationTopics.restaurantOrders(restaurantId);
+            messagingTemplate.convertAndSend(destination, notification);
+            log.debug("Notification sent to restaurant {} topic: {}", restaurantId, notification.getType());
+        } catch (Exception e) {
+            log.error("Failed to send notification to restaurant {} topic: {}", restaurantId, e.getMessage());
+        }
+    }
+
+    public void sendToOrderTopic(Long orderId, NotificationDTO notification) {
+        try {
+            String destination = NotificationTopics.orderUpdates(orderId);
+            messagingTemplate.convertAndSend(destination, notification);
+            log.debug("Notification sent to order {} topic: {}", orderId, notification.getType());
+        } catch (Exception e) {
+            log.error("Failed to send notification to order {} topic: {}", orderId, e.getMessage());
+        }
     }
 
     private void sendToUser(Long userId, NotificationDTO notification) {
         try {
             messagingTemplate.convertAndSendToUser(
                     userId.toString(),
-                    "/queue/notifications",
+                    NotificationTopics.USER_NOTIFICATIONS_QUEUE,
                     notification
             );
             log.debug("Notification sent to user {}: {}", userId, notification.getType());

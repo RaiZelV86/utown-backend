@@ -1,6 +1,7 @@
 package com.utown.model.dto.notification;
 
 import com.utown.model.enums.NotificationType;
+import com.utown.model.enums.OrderStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,4 +20,11 @@ public class NotificationDTO {
     private String message;
     private Object data;
     private LocalDateTime timestamp;
+    private Long orderId;
+    private String orderNumber;
+    private OrderStatus oldStatus;
+    private OrderStatus newStatus;
+    private LocalDateTime estimatedDeliveryTime;
+    private Long restaurantId;
+
 }
